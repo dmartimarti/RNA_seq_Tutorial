@@ -1,7 +1,11 @@
 ---
 title: "RNA Seq tutorial"
 author: "Daniel Martinez" 
-output: html_document
+output: 
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
+    math: katex
 
 knit: (function(input_file, encoding) {
   out_dir <- 'docs';
@@ -9,7 +13,7 @@ knit: (function(input_file, encoding) {
  encoding=encoding,
  output_file=file.path(dirname(input_file), out_dir, 'index.html'))})
 ---
-
+ <!-- arg' should be one of "default", "cerulean", "journal", "flatly", "darkly", "readable", "spacelab", "united", "cosmo", "lumen", "paper", "sandstone", "simplex", "yeti" -->
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
