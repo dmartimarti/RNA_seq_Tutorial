@@ -33,12 +33,18 @@ tximport will allow us to import the files from **Salmon** to R in a easy way. I
 <center>
 ![Screenshot of my folder names](./screenshots/quants_folder.PNG)
 </center>
-<br>
+
 Also, we'll need a file with all the metadata covering our experiment, with sample names that match the folder names that we want to read.
 
 ```{r echo=FALSE}
 library(knitr)
 samples = read.delim("sampleInfo.txt") 
 kable(samples, caption = 'My sample file')
+```
+
+If you save you metadata into a txt file with tab separation, you can easily read it with 
+
+```{r}
+samples = read.delim('sampleInfo.txt')
 ```
 
