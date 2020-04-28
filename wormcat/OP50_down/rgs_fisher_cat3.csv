@@ -1,0 +1,25 @@
+"","Category","RGS","AC","PValue"
+"5","Metabolism: lipid: fatty acid",6,68,1.33266657784358e-09
+"20","Transmembrane transport: chloride channel",2,44,0.00180461383703088
+"4","Metabolism: lipid: beta oxidation",2,78,0.0053395698510222
+"19","Transmembrane transport: ammonium",1,6,0.00928551330352845
+"16","Trafficking: ER/Golgi: ARF",1,9,0.0132379522087395
+"13","Proteolysis general: cysteine: other",1,10,0.0145518413761376
+"14","Proteolysis general: lysozyme",1,11,0.0158639394823443
+"12","Metabolism: pentose phosphate pathway",1,13,0.0184827725005473
+"15","Stress response: pathogen: saposin ",1,14,0.0197895123983175
+"17","Transcription factor: forkhead",1,14,0.0197895123983175
+"2","Extracellular material: galectin",1,25,0.0340466440902143
+"6","Metabolism: lipid: lipase",1,27,0.0366159525555766
+"21","Transmembrane transport: mitochondrial: solute carrier",1,34,0.0455535641614117
+"8","Metabolism: lipid: sphingolipid",1,43,0.0569201841513174
+"22","Transmembrane transport: other",1,51,0.0669074787400167
+"7","Metabolism: lipid: phospholipid",1,58,0.0755575155960843
+"9","Metabolism: lipid: sterol",1,59,0.0767865161134607
+"24","Unknown: regulated by multiple stresses",6,2248,0.0909094664068205
+"3","Metabolism: carbohydrate",1,83,0.10578602144876
+"10","Metabolism: nucleotide",1,111,0.138443115734377
+"1","Extracellular material: collagen",1,185,0.219000477077135
+"11","Metabolism: other",1,190,0.224157192254976
+"18","Transcription factor: NHR",1,259,0.291863476791388
+"23","Unknown",5,5830,0.865290188244156

@@ -1,0 +1,3 @@
+runtime:Apr-24-2020-19:05:19
+annotation_version:whole_genome_jul-03-2019.csv
+input_type:Wormbase.ID

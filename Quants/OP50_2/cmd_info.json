@@ -1,0 +1,12 @@
+{
+    "salmon_version": "1.1.0",
+    "index": "celegans_index",
+    "libType": "A",
+    "mates1": "/rdsgpfs/general/project/lms-cabreiro-raw/live/200320_D00467_0392_ACE2RVANXX/Unaligned/OP50C2_S70_L008_R1_001.fastq.gz",
+    "mates2": "/rdsgpfs/general/project/lms-cabreiro-raw/live/200320_D00467_0392_ACE2RVANXX/Unaligned/OP50C2_S70_L008_R2_001.fastq.gz",
+    "threads": "8",
+    "validateMappings": [],
+    "gcBias": [],
+    "output": "quants/OP50_2",
+    "auxDir": "aux_info"
+}

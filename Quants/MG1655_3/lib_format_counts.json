@@ -1,0 +1,22 @@
+{
+    "read_files": "[ /rdsgpfs/general/project/lms-cabreiro-raw/live/200320_D00467_0392_ACE2RVANXX/Unaligned/MGC3_S72_L008_R1_001.fastq.gz, /rdsgpfs/general/project/lms-cabreiro-raw/live/200320_D00467_0392_ACE2RVANXX/Unaligned/MGC3_S72_L008_R2_001.fastq.gz]",
+    "expected_format": "ISR",
+    "compatible_fragment_ratio": 1.0,
+    "num_compatible_fragments": 10748756,
+    "num_assigned_fragments": 10748756,
+    "num_frags_with_concordant_consistent_mappings": 9481230,
+    "num_frags_with_inconsistent_or_orphan_mappings": 1285738,
+    "strand_mapping_bias": 0.000005695431125151404,
+    "MSF": 0,
+    "OSF": 0,
+    "ISF": 54,
+    "MSR": 0,
+    "OSR": 0,
+    "ISR": 9481230,
+    "SF": 608836,
+    "SR": 676848,
+    "MU": 0,
+    "OU": 0,
+    "IU": 0,
+    "U": 0
+}
