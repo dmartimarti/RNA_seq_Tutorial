@@ -3,3 +3,5 @@
 .here
 .RData
 .Rhistory
+__packages
+.rdb
