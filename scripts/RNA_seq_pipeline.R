@@ -17,8 +17,11 @@
 
 
 library(tximport)
-library(tidyverse)
 library(DESeq2)
+
+
+library(tidyverse)
+
 
 here::set_here()
 library(here)

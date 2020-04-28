@@ -14,22 +14,28 @@ knit: (function(input_file, encoding) {
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+## Tutorial to analyse RNA-seq data
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+This tutorial will cover from the raw data obtained with [**Salmon**](https://combine-lab.github.io/salmon/), to different analyses such as PCA plots, log2FC comparisons, or functional enrichment. The main programming language will be **R**, and although a basic knowledge is required to follow this tutorial, I will try to explain every piece of code.
+*
+The backbone of this tutorial is the R package [**DESeq2**](https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html), which is a package that allows you to perform all the statistical comparisons of interest in a very powerful and simple way.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+Let's start by loading the required libraries. 
 
-```{r cars}
-summary(cars)
+```{r message=FALSE}
+library(tximport)
+library(DESeq2)
 ```
 
-## Including Plots
+tximport will allow us to import the files from **Salmon** to R in a easy way. If you followed **Salmon** tutorial, you should have a folder named *Quants* with more subfolders that will be named in a unique name. For example, in our case, we are studying the transcriptome of *C. elegans* with two different *E. coli* strains (OP50 and MG1665), and a double mutation in each one of these strains. Hence, our sample names will be: OP50, MG1655, OP50_PDXJK, and MG1655_PDXJK, with a number determining the replicate. In my case it is like in the following image:
 
-You can also embed plots, for example:
+![Screenshot of my folder names](./screenshots/quants_folder.PNG)
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+Also, we'll need a file with all the metadata covering our experiment, with sample names that match the folder names that we want to read.
+
+```{r echo=FALSE}
+library(knitr)
+samples = read.delim("sampleInfo.txt") 
+kable(samples, caption = 'My sample file')
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
