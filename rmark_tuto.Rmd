@@ -1,6 +1,7 @@
 ---
 title: "RNA Seq tutorial"
 author: "Daniel Martinez" 
+cache: TRUE
 output: 
   prettydoc::html_pretty:
     theme: architect
@@ -13,7 +14,8 @@ knit: (function(input_file, encoding) {
  encoding=encoding,
  output_file=file.path(dirname(input_file), out_dir, 'index.html'))})
 ---
- <!-- arg' should be one of "default", "cerulean", "journal", "flatly", "darkly", "readable", "spacelab", "united", "cosmo", "lumen", "paper", "sandstone", "simplex", "yeti" -->
+
+<!-- https://holtzy.github.io/Pimp-my-rmd/ -->
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
@@ -22,7 +24,7 @@ knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
 ## Tutorial to analyse RNA-seq data
 
 This tutorial will cover from the raw data obtained with [**Salmon**](https://combine-lab.github.io/salmon/), to different analyses such as PCA plots, log2FC comparisons, or functional enrichment. The main programming language will be **R**, and although a basic knowledge is required to follow this tutorial, I will try to explain every piece of code.
-*
+
 The backbone of this tutorial is the R package [**DESeq2**](https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html), which is a package that allows you to perform all the statistical comparisons of interest in a very powerful and simple way.
 <br>
 Let's start by loading the required libraries. 
@@ -51,6 +53,92 @@ If you save you metadata into a txt file with tab separation, you can easily rea
 
 ```{r}
 samples = read.delim('sampleInfo.txt')
+```
+
+After reading the metadata, we are going to get the current path of our analysis and rename the row names of our sample file with the sample names. 
+
+```{r}
+dir = getwd()
+rownames(samples) = samples$Name
+```
+
+With the *file.path* function, we can iterate for each one of the sample names and concatenate them with the folder names to get a complete path for each one of the quant.sf files (where the counts are contained).
+
+```{r}
+# prepare a list with file names
+files = file.path(dir,"quants", samples$Name, "quant.sf")
+# add the sample names to each one of the paths
+names(files) = samples$Name
+# check that files exist in your folders, 
+all(file.exists(files)) 
+```
+
+If you have done the previous steps correctly, you should have something like this when you see your *files* variable:
+
+```{r echo=FALSE}
+files[1:5]
+```
+
+Now, we are going to use a function from the *AnnotationHub* library to load and create an object with all the reference genes and transcripts from *C. elegans*. In this case, I used the option proxy in the localHub because, some times, the default options gives a connection error and you can't download the database. If you don't have the package *AnnotationHub* installed in R, use this code first:
+
+```{r eval=FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("AnnotationHub")
+BiocManager::install("GenomicFeatures")
+```
+
+Once installed, let's get our database from ensembldb:
+
+```{r message=FALSE}
+
+# let's make our database from ensembldb 
+ah = AnnotationHub::AnnotationHub(localHub = FALSE, proxy='127.0.0.1:10801')
+ahDb = AnnotationHub::query(ah, pattern = c("Caenorhabditis elegans", "EnsDb", 99))
+ahEdb = ahDb[[1]]
+```
+
+There, you should have an object created (*ahEdb*) that has all the annotations for *C. elegans*. We will use it to parse the transcript counts from *salmon* and then have a list with gene transcript counts that we can use for the analysis. 
+
+The next step is to create a data frame with all the transcript information from the *ensembldb* object that contains gene information. And we will do a serial of data transformations to fetch the gene description and create a file that we can use in the future without the need of loading agin *ensembldb* objects. 
+
+
+
+```{r eval=FALSE}
+# generate the database 
+tx2gene.complete = transcripts(ahEdb, return.type = "DataFrame")
+
+# fetch descriptions of genes
+info = genes(ahEdb) %>% 
+  tbl_df() %>%
+  dplyr::select(width, gene_id, gene_name, gene_biotype, description, entrezid) %>%
+  unnest
+
+# join transcription info with gene ids and entrezids
+info.join = tx2gene.complete %>% 
+  tbl_df() %>%
+  dplyr::select(tx_id, tx_biotype, gene_id, tx_name) %>%
+  left_join(info)
+
+write.csv(info, here('summary','gene_ids_mapping.csv'))
+
+
+```
+
+```{r eval=TRUE, echo=FALSE}
+tx2gene.complete = transcripts(ahEdb, return.type = "DataFrame")
+
+```
+
+
+And now, finally, the interesting part. Subset the data frame so we have only the info that is relevant for the analysis, and use the tximport function to import the gene counts with the transcription information we gathered previously.
+
+```{r}
+tx2gene = tx2gene.complete[,c(1,7)]
+
+# import quantification data 
+txi = tximport(files, type = "salmon", tx2gene = tx2gene)
 ```
 
 

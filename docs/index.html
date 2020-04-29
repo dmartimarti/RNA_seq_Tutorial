@@ -163,10 +163,11 @@ code span.ot { color: #007020; }
 <div id="content-wrapper">
   <div class="inner clearfix">
     <section id="main-content">
-<p><!-- arg' should be one of "default", "cerulean", "journal", "flatly", "darkly", "readable", "spacelab", "united", "cosmo", "lumen", "paper", "sandstone", "simplex", "yeti" --></p>
+<!-- https://holtzy.github.io/Pimp-my-rmd/ -->
 <div id="tutorial-to-analyse-rna-seq-data" class="section level2">
 <h2>Tutorial to analyse RNA-seq data</h2>
-<p>This tutorial will cover from the raw data obtained with <a href="https://combine-lab.github.io/salmon/"><strong>Salmon</strong></a>, to different analyses such as PCA plots, log2FC comparisons, or functional enrichment. The main programming language will be <strong>R</strong>, and although a basic knowledge is required to follow this tutorial, I will try to explain every piece of code. * The backbone of this tutorial is the R package <a href="https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html"><strong>DESeq2</strong></a>, which is a package that allows you to perform all the statistical comparisons of interest in a very powerful and simple way. <br> Let’s start by loading the required libraries. <br></p>
+<p>This tutorial will cover from the raw data obtained with <a href="https://combine-lab.github.io/salmon/"><strong>Salmon</strong></a>, to different analyses such as PCA plots, log2FC comparisons, or functional enrichment. The main programming language will be <strong>R</strong>, and although a basic knowledge is required to follow this tutorial, I will try to explain every piece of code.</p>
+<p>The backbone of this tutorial is the R package <a href="https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html"><strong>DESeq2</strong></a>, which is a package that allows you to perform all the statistical comparisons of interest in a very powerful and simple way. <br> Let’s start by loading the required libraries. <br></p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(tximport)</a>
 <a class="sourceLine" id="cb1-2" title="2"><span class="kw">library</span>(DESeq2)</a></code></pre></div>
 <p>tximport will allow us to import the files from <strong>Salmon</strong> to R in a easy way. If you followed <strong>Salmon</strong> tutorial, you should have a folder named <em>Quants</em> with more subfolders that will be named in a unique name. For example, in our case, we are studying the transcriptome of <em>C. elegans</em> with two different <em>E. coli</em> strains (OP50 and MG1665), and a double mutation in each one of these strains. Hence, our sample names will be: OP50, MG1655, OP50_PDXJK, and MG1655_PDXJK, with a number determining the replicate. In my case it is like in the following image:</p>
@@ -302,6 +303,40 @@ code span.ot { color: #007020; }
 </table>
 <p>If you save you metadata into a txt file with tab separation, you can easily read it with</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">samples =<span class="st"> </span><span class="kw">read.delim</span>(<span class="st">&#39;sampleInfo.txt&#39;</span>)</a></code></pre></div>
+<p>After reading the metadata, we are going to get the current path of our analysis and rename the row names of our sample file with the sample names.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">dir =<span class="st"> </span><span class="kw">getwd</span>()</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="kw">rownames</span>(samples) =<span class="st"> </span>samples<span class="op">$</span>Name</a></code></pre></div>
+<p>With the <em>file.path</em> function, we can iterate for each one of the sample names and concatenate them with the folder names to get a complete path for each one of the quant.sf files (where the counts are contained).</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="co"># prepare a list with file names</span></a>
+<a class="sourceLine" id="cb4-2" title="2">files =<span class="st"> </span><span class="kw">file.path</span>(dir,<span class="st">&quot;quants&quot;</span>, samples<span class="op">$</span>Name, <span class="st">&quot;quant.sf&quot;</span>)</a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="co"># add the sample names to each one of the paths</span></a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="kw">names</span>(files) =<span class="st"> </span>samples<span class="op">$</span>Name</a>
+<a class="sourceLine" id="cb4-5" title="5"><span class="co"># check that files exist in your folders, </span></a>
+<a class="sourceLine" id="cb4-6" title="6"><span class="kw">all</span>(<span class="kw">file.exists</span>(files)) </a></code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+<p>If you have done the previous steps correctly, you should have something like this when you see your <em>files</em> variable:</p>
+<pre><code>##                                                                OP50_1 
+##       &quot;D:/MRC_Postdoc/Others/RNA_seq_Tutorial/quants/OP50_1/quant.sf&quot; 
+##                                                                OP50_2 
+##       &quot;D:/MRC_Postdoc/Others/RNA_seq_Tutorial/quants/OP50_2/quant.sf&quot; 
+##                                                                OP50_3 
+##       &quot;D:/MRC_Postdoc/Others/RNA_seq_Tutorial/quants/OP50_3/quant.sf&quot; 
+##                                                                OP50_4 
+##       &quot;D:/MRC_Postdoc/Others/RNA_seq_Tutorial/quants/OP50_4/quant.sf&quot; 
+##                                                          OP50_PDXJK_1 
+## &quot;D:/MRC_Postdoc/Others/RNA_seq_Tutorial/quants/OP50_PDXJK_1/quant.sf&quot;</code></pre>
+<p>Now, we are going to use a function from the <em>AnnotationHub</em> library to load and create an object with all the reference genes and transcripts from <em>C. elegans</em>. In this case, I used the option proxy in the localHub because, some times, the default options gives a connection error and you can’t download the database. If you don’t have the package <em>AnnotationHub</em> installed in R, use this code first:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="cf">if</span> (<span class="op">!</span><span class="kw">requireNamespace</span>(<span class="st">&quot;BiocManager&quot;</span>, <span class="dt">quietly =</span> <span class="ot">TRUE</span>))</a>
+<a class="sourceLine" id="cb7-2" title="2">    <span class="kw">install.packages</span>(<span class="st">&quot;BiocManager&quot;</span>)</a>
+<a class="sourceLine" id="cb7-3" title="3"></a>
+<a class="sourceLine" id="cb7-4" title="4">BiocManager<span class="op">::</span><span class="kw">install</span>(<span class="st">&quot;AnnotationHub&quot;</span>)</a></code></pre></div>
+<p>Once installed, let’s get our database from ensembldb:</p>
+<pre message="FALSEr"><code>
+# let&#39;s make our database from ensembldb 
+ah = AnnotationHub::AnnotationHub(localHub = FALSE, proxy=&#39;127.0.0.1:10801&#39;)
+ahDb = AnnotationHub::query(ah, pattern = c(&quot;Caenorhabditis elegans&quot;, &quot;EnsDb&quot;, 99))
+ahEdb = ahDb[[1]]</code></pre>
+<p>There, you should have an object created (<em>ahEdb</em>) that has all the annotations for <em>C. elegans</em>. We will use it to parse the transcript counts from <em>salmon</em> and then have a list with gene transcript counts that we can use for the analysis.</p>
 <p><br><br><br><br></p>
 </div>
     </section>
