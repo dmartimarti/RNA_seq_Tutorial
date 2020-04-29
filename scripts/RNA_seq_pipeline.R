@@ -63,6 +63,8 @@ ahEdb = ahDb[[1]]
 # generate the database 
 tx2gene.complete = transcripts(ahEdb, return.type = "DataFrame")
 
+write.csv(tx2gene.complete, here('summary','tx2gene.complete.csv'))
+
 # fetch descriptions of genes
 info = genes(ahEdb) %>% 
   tbl_df() %>%

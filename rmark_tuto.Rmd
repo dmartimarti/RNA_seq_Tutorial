@@ -33,6 +33,7 @@ Let's start by loading the required libraries.
 ```{r message=FALSE}
 library(tximport)
 library(DESeq2)
+library(tidyverse)
 ```
 
 tximport will allow us to import the files from **Salmon** to R in a easy way. If you followed **Salmon** tutorial, you should have a folder named *Quants* with more subfolders that will be named in a unique name. For example, in our case, we are studying the transcriptome of *C. elegans* with two different *E. coli* strains (OP50 and MG1665), and a double mutation in each one of these strains. Hence, our sample names will be: OP50, MG1655, OP50_PDXJK, and MG1655_PDXJK, with a number determining the replicate. In my case it is like in the following image:
@@ -127,15 +128,24 @@ write.csv(info, here('summary','gene_ids_mapping.csv'))
 ```
 
 ```{r eval=TRUE, echo=FALSE}
-tx2gene.complete = transcripts(ahEdb, return.type = "DataFrame")
-
+tx2gene.complete = read_csv('summary/tx2gene.complete.csv')
 ```
 
 
 And now, finally, the interesting part. Subset the data frame so we have only the info that is relevant for the analysis, and use the tximport function to import the gene counts with the transcription information we gathered previously.
 
-```{r}
+```{r eval=FALSE}
+# subset to have tx_id in first column, and gene_id in second
 tx2gene = tx2gene.complete[,c(1,7)]
+
+# import quantification data 
+txi = tximport(files, type = "salmon", tx2gene = tx2gene)
+```
+
+
+```{r echo=FALSE}
+# subset to have tx_id in first column, and gene_id in second
+tx2gene = tx2gene.complete[,c(2,8)]
 
 # import quantification data 
 txi = tximport(files, type = "salmon", tx2gene = tx2gene)
